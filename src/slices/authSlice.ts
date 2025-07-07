@@ -2,21 +2,26 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { ERequestStatus, type TUser } from '@/lib/types';
 
 type TInitialState = {
+	id: number | null;
 	user: TUser | null,
 	isAuthenticated: boolean,
 	status: ERequestStatus
 }
 
 const initialState: TInitialState = {
+	id: null,
 	user: null,
 	isAuthenticated: false,
 	status: ERequestStatus.INIT
 }
 
-export enum EAction {
+export enum EAuthAction {
 	LOGIN = "LOGIN",
 	LOGIN_SUCCESS = "LOGIN_SUCCESS",
-	LOGIN_REJECTED = "LOGIN_REJECTED"
+	LOGIN_REJECTED = "LOGIN_REJECTED",
+
+	LOGOUT = "LOGOUT",
+	SET_USER = "USER"
 }
 
 const authSlice = createSlice({
@@ -24,24 +29,30 @@ const authSlice = createSlice({
 	initialState,
 	reducers: {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		[EAction.LOGIN](state, action: PayloadAction<{ email: string, password: string }>) {
+		[EAuthAction.LOGIN](state, action: PayloadAction<{ email: string, password: string }>) {
 			state.status = ERequestStatus.PENDING
 		},
-		[EAction.LOGIN_SUCCESS](state, action: PayloadAction<TUser>) {
+		[EAuthAction.LOGIN_SUCCESS](state, action: PayloadAction<number>) {
 			state.status = ERequestStatus.FULFILLED
-			state.user = action.payload
+			state.id = action.payload
 			state.isAuthenticated = true
 		},
-		[EAction.LOGIN_REJECTED](state) {
+		[EAuthAction.LOGIN_REJECTED](state) {
 			state.status = ERequestStatus.REJECTED
 			state.user = null
 			state.isAuthenticated = false
-		}
+		},
+		[EAuthAction.LOGOUT](state){
+			state.status = ERequestStatus.INIT
+			state.user = null;
+			state.isAuthenticated = false
+		},
 	},
 	selectors: {
 		getIsAuthenticated: state => state.isAuthenticated,
 		getStatus: state => state.status,
-		getUser: state => state.user
+		getAuthUser: state => state.user,
+		getAuthId: state => state.id,
 	}
 })
 

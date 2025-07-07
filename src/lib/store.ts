@@ -4,6 +4,7 @@ import API from '@/lib//API';
 import rootSaga from '@/sagas';
 import authSlice from '@/slices/authSlice';
 import { useDispatch, useSelector, useStore } from 'react-redux';
+import usersSlice from '@/slices/usersSlice';
 
 const initStore = () => {
 	const sagaMiddleware = createSagaMiddleware<{ API: API }>({
@@ -14,7 +15,8 @@ const initStore = () => {
 
 	const store = configureStore({
 		reducer: {
-			"@auth": authSlice.reducer
+			"@auth": authSlice.reducer,
+			"@users": usersSlice.reducer
 		},
 		middleware: (getDefaultMiddleware) => getDefaultMiddleware({
 			thunk: false,

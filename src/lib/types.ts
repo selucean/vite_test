@@ -18,7 +18,7 @@ export type TUser = {
 	email: string;
 	managerId?: number;
 	photo?: string;
-	initials?: string;
+	initials: string;
 }
 
 export type TManager = {
