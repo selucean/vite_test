@@ -1,3 +1,4 @@
+import { parseData } from '@/lib/parser';
 import usersSlice, { EUsersAction } from '@/slices/usersSlice';
 import { call, getContext, put, takeEvery } from 'typed-redux-saga';
 
@@ -11,7 +12,8 @@ function* getUsers() {
 		}
 
 		yield* put(usersSlice.actions[EUsersAction.GET_USERS_SUCCESS]({
-			users
+			parsedUsers: parseData(users),
+			users: users
 		}));
 
 	} catch (error) {

@@ -1,8 +1,13 @@
+import { InitialsPlaceholder } from '@/components/InitialsPlaceholder';
 import { useAppDispatch, useAppSelector } from '@/lib/store';
 import { ERequestStatus, type TManager, type TUser } from '@/lib/types';
+import authSlice, { EAuthAction } from '@/slices/authSlice';
 import usersSlice, { EUsersAction } from '@/slices/usersSlice';
 import { Plus, Minus } from "lucide-react"
 import { Suspense, useEffect, useState, type ReactNode } from 'react';
+
+
+// TODO: Split these comonents to the componesnts dir
 
 const ManagerItem = ({ data}: { data: TManager }) => {
 	const [isOpen, setIsOpen] = useState(true);
@@ -22,26 +27,17 @@ const ManagerItem = ({ data}: { data: TManager }) => {
 			</div>
 			<div className={`manager-item-content grid gap-2 pl-8 transition-all duration-300 ${isOpen ? 'open' : ''}`}>
 				{
-					isOpen && teamMembers.map((user) => (
-						<UserItem key={user.id} data={user} />
-					))
+					isOpen && teamMembers.map((user) => {
+						if (user.managerId) {
+							return <ManagerItem key={user.id} data={user as TManager} />
+						}
+						return <UserItem key={user.id} data={user} />
+					})
 				}
 			</div>
 		</div>
 	);
 }
-
-const InitialsPlaceholder = ({
-	initials
-}: {
-	initials: string
-}) => (
-	<div className='w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center'>
-		<span className='text-gray-600'>
-			{initials}
-		</span>
-	</div>
-)
 
 const UserItem = ({
 	data,
@@ -87,12 +83,19 @@ export default function Team() {
 	const dispatch = useAppDispatch();
 	const users = useAppSelector(usersSlice.selectors.getUsers);
 	const status = useAppSelector(usersSlice.selectors.getStatus);
+	const isAuthenticated = useAppSelector(authSlice.selectors.getIsAuthenticated);
 
 	useEffect(() => {
 		if (status === ERequestStatus.INIT || users.length === 0) {
 			dispatch(usersSlice.actions[EUsersAction.GET_USERS]());
 		}
 	}, [status]);
+
+	useEffect(() => {
+		if (!isAuthenticated) {
+			dispatch(authSlice.actions[EAuthAction.LOGOUT]());
+		}
+	}, [isAuthenticated]);
 
 	if (!users) {
 		return null;

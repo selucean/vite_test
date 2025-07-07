@@ -1,5 +1,4 @@
 import { POISON_ARRAY } from '@/constants';
-import { parseData } from './parser';
 
 export default class API {
 	async login(payload: { email: string, password: string }) {
@@ -35,7 +34,7 @@ export default class API {
 			}
 			const data = await response.json();
 
-			return parseData(data);
+			return data;
 
 		} catch (e) {
 			console.error("Error fetching users:", e);

@@ -38,8 +38,8 @@ export default function LoginForm() {
 	}, [isAuthenticated, authStatus]);
 
 	return (
-		<div className='grid grid-cols-6 mx-auto w-3xl bg-slate-400 rounded-2xl py-10'>
-			<h2 className='col-span-6 text-center text-slate-600 font-bold'>
+		<div className='grid grid-cols-6 mx-auto w-3xl bg-gray-300 rounded-2xl py-10 shadow'>
+			<h2 className='col-span-6 text-center text-slate-600 font-bold mb-4'>
 				Login
 			</h2>
 			<form
@@ -65,7 +65,7 @@ export default function LoginForm() {
 
 				<button
 					type='submit'
-					className='bg-slate-600 text-white rounded-sm p-2 hover:bg-red-500 transition-colors duration-200 mt-4 max-w-52'>
+					className='bg-slate-600 text-white rounded-sm p-2 hover:bg-red-500 transition-colors duration-200 mt-4 mx-auto px-8'>
 					Submit
 				</button>
 			</form>

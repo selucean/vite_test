@@ -34,7 +34,7 @@ export const UiInput = ({
 		>
 			<input 
 				id = { id }
-				className='w-full flex-1 border-0 bg-transparent outline-hidden placeholder:text-gray-300'
+				className='w-full flex-1 border-0 bg-transparent outline-hidden placeholder:text-gray-400'
 				{ ...props }
 			/>
 		</label>

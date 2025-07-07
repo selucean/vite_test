@@ -1,14 +1,16 @@
-import { ERequestStatus, type TManager } from '@/lib/types';
+import { ERequestStatus, type TManager as TParsedUser, type TUser } from '@/lib/types';
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 export type TUsersState = {
-	users: TManager[];
+	cachedData: TUser[] | null,
 	status: ERequestStatus;
+	users: TParsedUser[];
 };
 
 const initialState: TUsersState = {
-	users: [],
+	cachedData: null,
 	status: ERequestStatus.INIT,
+	users: [],
 };
 
 export enum EUsersAction {
@@ -24,9 +26,10 @@ const usersSlice = createSlice({
 		[EUsersAction.GET_USERS](state) {
 			state.status = ERequestStatus.PENDING;
 		},
-		[EUsersAction.GET_USERS_SUCCESS](state, action: PayloadAction<{ users: TManager[] }>) {
+		[EUsersAction.GET_USERS_SUCCESS](state, action: PayloadAction<{ parsedUsers: TParsedUser[], users: TUser[] }>) {
 			state.status = ERequestStatus.FULFILLED;
-			state.users = action.payload.users;
+			state.users = action.payload.parsedUsers;
+			state.cachedData = action.payload.users;
 		},
 		[EUsersAction.GET_USERS_REJECTED](state) {
 			state.status = ERequestStatus.REJECTED;
@@ -34,7 +37,8 @@ const usersSlice = createSlice({
 		},
 	},
 	selectors: {
-		getUser: (state, id: number) => state.users.find(user => user.id === id),
+		getCachedData: (state) => state.cachedData,
+		getUser: (state, id: number) => state.cachedData?.find(user => user.id === id),
 		getUsers: (state) => state.users,
 		getStatus: (state) => state.status,
 	},

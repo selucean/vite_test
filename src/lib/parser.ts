@@ -1,59 +1,73 @@
 import type { TUser, TManager } from './types';
 
-const generateInitals = (firstName: string, lastName: string) => {
+const generateInitials = (firstName: string, lastName: string) => {
 	return `${firstName.charAt(0).toUpperCase()}${lastName.charAt(0).toUpperCase()}`;
 }
 
-export const parseData = (data: TUser[]) => {
+export const parseData = (data: TUser[]): TManager[] => {
 	if (!data.length) return [];
 	
-	const managers: TManager[] = [];
+	const userMap = new Map<number, TUser>();
+	const managerIds = new Set<number>();
 
 	data.forEach(user => {
-		if (!user.managerId) {
-			const initials = generateInitals(user.firstName, user.lastName);
-			managers.push({
-				id: user.id,
-				firstName: user.firstName,
-				lastName: user.lastName,
-				email: user.email,
-				photo: user.photo,
-				initials: initials,
-				teamMembers: []
-			});
+		userMap.set(user.id, user);
+		if (user.managerId) {
+			managerIds.add(user.managerId);
+		} else {
+			managerIds.add(user.id);
 		}
 	});
-
-	data.forEach(user => {
-		const initials = generateInitals(user.firstName, user.lastName);
-		const existingManager = managers.find(m => m.id === user.id);
-
-		if (existingManager) {
-			return;
-		}
-
-		if (user.managerId) {
-			const manager = managers.find(manager => manager.id === user.managerId);
-			if (manager) {
-				manager.teamMembers.push({
-					id: user.id,
-					firstName: user.firstName,
-					lastName: user.lastName,
-					email: user.email,
-					photo: user.photo,
-					initials: initials
+	
+	
+	const buildManagerHierarchy = (userId: number): TManager | null => {
+		const user = userMap.get(userId);
+		if (!user) return null;
+		
+		const initials = generateInitials(user.firstName, user.lastName);
+		
+		const subTeamMembers = data.filter(user => user.managerId === userId);
+		
+		const teamMembers: TManager[] = [];
+		subTeamMembers.forEach(report => {
+			if (managerIds.has(report.id)) {
+				const subManager = buildManagerHierarchy(report.id);
+				if (subManager) {
+					teamMembers.push(subManager);
+				}
+			} else {
+				teamMembers.push({
+					id: report.id,
+					firstName: report.firstName,
+					lastName: report.lastName,
+					email: report.email,
+					photo: report.photo,
+					initials: generateInitials(report.firstName, report.lastName),
+					teamMembers: []
 				});
 			}
-		} else {
-			const manager = managers.find(m => m.id === user.id);
+		});
+		
+		return {
+			id: user.id,
+			firstName: user.firstName,
+			lastName: user.lastName,
+			email: user.email,
+			photo: user.photo,
+			initials: initials,
+			teamMembers: teamMembers
+		};
+	};
+	
+	const topLevelManagers: TManager[] = [];
+	data.forEach(user => {
+		if (!user.managerId && managerIds.has(user.id)) {
+			const manager = buildManagerHierarchy(user.id);
 			if (manager) {
-				manager.initials = initials;
+				topLevelManagers.push(manager);
 			}
 		}
 	});
-
-	return managers.map(manager => ({
-		...manager,
-		initials: manager.initials || generateInitals(manager.firstName, manager.lastName)
-	}));
+	
+	return topLevelManagers;
 }

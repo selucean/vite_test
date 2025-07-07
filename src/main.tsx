@@ -1,10 +1,10 @@
 import './index.css'
 import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, Outlet, RouterProvider as Provider } from 'react-router'
-import StoreProvider from './components/providers/StoreProvider.tsx'
-import LoginForm from './pages/LoginForm.tsx'
-import Team from './pages/Team.tsx'
-import Header from './components/Header.tsx'
+import StoreProvider from '@/components/providers/StoreProvider.tsx'
+import LoginForm from '@/pages/LoginForm.tsx'
+import Team from '@/pages/Team.tsx'
+import Header from '@/components/Header.tsx'
 
 const root = createRoot(document.getElementById("root")!);
 
