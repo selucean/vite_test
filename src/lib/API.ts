@@ -1,19 +1,44 @@
-import { POISON_ARRAY } from '@/constants';
+import { BASE_URL, POISON_ARRAY } from '@/constants';
 
 export default class API {
+	constructor() {
+		this.makeRequest = this.makeRequest.bind(this);
+		this.login = this.login.bind(this);
+		this.logout = this.logout.bind(this);
+		this.storeCookie = this.storeCookie.bind(this);
+		this.getCookie = this.getCookie.bind(this);
+		this.getUsers = this.getUsers.bind(this);
+		this.getUser = this.getUser.bind(this);
+	}
+	async makeRequest(secret: string): Promise<number | null> {
+		try {
+			const response = await fetch(`${BASE_URL}/secrets/${secret}.json`);
+			if (!response.ok) {
+				throw new Error("Failed to fetch secret");
+			}
+			const data = await response.json();
+			if (!data) {
+				throw new Error("Invalid secret data");
+			}
+			return data;
+		} catch (error) {
+			console.error("Error fetching secret:", error);
+			throw error;
+		}
+	};
+	
 	async login(payload: { email: string, password: string }) {
 		const { email, password } = payload;
 
 		try {
 			const encoded = _encode(email, password);
-			const response = await fetch(`https://gongfetest.firebaseio.com/secrets/${encoded}.json`);
+			const data = await this.makeRequest(encoded);
 
-			if (!response.ok) {
-				throw new Error("Login failed");
+			if (!data) {
+				throw new Error("Invalid credentials");
 			}
 
-			const data = await response.json();
-
+			await this.storeCookie(encoded);
 			return data;
 
 		} catch (error) {
@@ -23,16 +48,48 @@ export default class API {
 	}
 
 	async logout(){
-		// Placeholder for logout logic
+		try {
+			document.cookie = "testUserId=; path=/; max-age=0; secure; samesite=strict";
+		} catch (e) {
+			console.error("Error during logout:", e);
+			throw e;
+		}
+	}
+
+	async storeCookie(cookie: string) {
+		try {
+			document.cookie = `testUserId=${cookie}; path=/; max-age=86400; secure; samesite=strict`;
+		} catch (e) {
+			console.error("Error storing cookie:", e);
+			throw e;
+		}
+	}
+
+	async getCookie() {
+		try {
+			const cookieValue = document.cookie.split('; ').find(row => row.startsWith('testUserId='));
+			if (cookieValue) {
+				return cookieValue.split('=')[1];
+			} else {
+				return null;
+			}
+		} catch (e) {
+			console.error("Error retrieving cookie:", e);
+			throw e;
+		}
 	}
 
 	async getUsers() {
 		try {
-			const response = await fetch("https://gongfetest.firebaseio.com/users.json");
+			const response = await fetch(`${BASE_URL}/users.json`);
 			if (!response.ok) {
 				throw new Error("Failed to fetch users");
 			}
 			const data = await response.json();
+
+			if (!data) {
+				throw new Error("Invalid users data");
+			}
 
 			return data;
 
@@ -45,7 +102,7 @@ export default class API {
 	// assumed this would work but that would be too easy
 	async getUser(id: string) {
 		try {
-			const response = await fetch(`https://gongfetest.firebaseio.com/users/${id}.json`);
+			const response = await fetch(`${BASE_URL}/users/${id}.json`);
 			if (!response.ok) {
 				throw new Error("Failed to fetch user");
 			}

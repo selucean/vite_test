@@ -2,7 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import createSagaMiddleware from 'redux-saga';
 import API from '@/lib//API';
 import rootSaga from '@/sagas';
-import authSlice from '@/slices/authSlice';
+import authSlice, { EAuthAction} from '@/slices/authSlice';
 import { useDispatch, useSelector, useStore } from 'react-redux';
 import usersSlice from '@/slices/usersSlice';
 
@@ -29,6 +29,8 @@ const initStore = () => {
 }
 
 export const store = initStore();
+
+store.dispatch(authSlice.actions[EAuthAction.GET_USER_INFO]());
 
 
 export type TAppStore = ReturnType<typeof initStore>;
