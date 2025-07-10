@@ -1,10 +1,10 @@
-import type { TUser, TManager } from './types';
+import type { TUser, TParsedUser } from './types';
 
 const generateInitials = (firstName: string, lastName: string) => {
 	return `${firstName.charAt(0).toUpperCase()}${lastName.charAt(0).toUpperCase()}`;
 }
 
-export const parseData = (data: TUser[]): TManager[] => {
+export const parseData = (data: TUser[]): TParsedUser[] => {
 	if (!data.length) return [];
 	
 	const userMap = new Map<number, TUser>();
@@ -20,7 +20,7 @@ export const parseData = (data: TUser[]): TManager[] => {
 	});
 	
 	
-	const buildManagerHierarchy = (userId: number): TManager | null => {
+	const buildManagerHierarchy = (userId: number): TParsedUser | null => {
 		const user = userMap.get(userId);
 		if (!user) return null;
 		
@@ -28,21 +28,21 @@ export const parseData = (data: TUser[]): TManager[] => {
 		
 		const subTeamMembers = data.filter(user => user.managerId === userId);
 		
-		const teamMembers: TManager[] = [];
-		subTeamMembers.forEach(report => {
-			if (managerIds.has(report.id)) {
-				const subManager = buildManagerHierarchy(report.id);
+		const teamMembers: TParsedUser[] = [];
+		subTeamMembers.forEach(subTeamMember => {
+			if (managerIds.has(subTeamMember.id)) {
+				const subManager = buildManagerHierarchy(subTeamMember.id);
 				if (subManager) {
 					teamMembers.push(subManager);
 				}
 			} else {
 				teamMembers.push({
-					id: report.id,
-					firstName: report.firstName,
-					lastName: report.lastName,
-					email: report.email,
-					photo: report.photo,
-					initials: generateInitials(report.firstName, report.lastName),
+					id: subTeamMember.id,
+					firstName: subTeamMember.firstName,
+					lastName: subTeamMember.lastName,
+					email: subTeamMember.email,
+					photo: subTeamMember.photo,
+					initials: generateInitials(subTeamMember.firstName, subTeamMember.lastName),
 					teamMembers: []
 				});
 			}
@@ -55,11 +55,12 @@ export const parseData = (data: TUser[]): TManager[] => {
 			email: user.email,
 			photo: user.photo,
 			initials: initials,
+			managerId: user.managerId,
 			teamMembers: teamMembers
 		};
 	};
 	
-	const topLevelManagers: TManager[] = [];
+	const topLevelManagers: TParsedUser[] = [];
 	data.forEach(user => {
 		if (!user.managerId && managerIds.has(user.id)) {
 			const manager = buildManagerHierarchy(user.id);

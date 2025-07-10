@@ -21,9 +21,9 @@ export type TUser = {
 	initials: string;
 }
 
-export type TManager = {
+export type TParsedUser = {
 	teamMembers: TUser[];
-} & Omit<TUser, 'managerId'>;
+} & TUser;
 
 export type TData = {
 	secrets: Record<string, string>;
