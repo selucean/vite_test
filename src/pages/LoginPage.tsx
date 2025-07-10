@@ -25,7 +25,7 @@ export default function LoginPage() {
 
 	const {
 		handleSubmit,
-		formState: { errors, touchedFields  },
+		formState: { errors, isSubmitted  },
 		control,
 		setError,
 		clearErrors
@@ -53,12 +53,12 @@ export default function LoginPage() {
 	}, [isAuthenticated, authStatus]);
 
 	useEffect(() => {
-		if (authStatus === ERequestStatus.REJECTED && (touchedFields.email || touchedFields.password)) {
+		if (authStatus === ERequestStatus.REJECTED && isSubmitted) {
 			setError("root", {
 				message: "Invalid email or password"
 			});
 		}
-	}, [authStatus, touchedFields]);
+	}, [authStatus, isSubmitted]);
 
 	return (
 		<div className='grid grid-cols-6 mx-auto min-w-md lg:w-3xl bg-violet-100 border border-violet-200 rounded-xl py-10 shadow'>
