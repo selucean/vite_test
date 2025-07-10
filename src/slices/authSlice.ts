@@ -21,7 +21,8 @@ export enum EAuthAction {
 	LOGIN_REJECTED = "LOGIN_REJECTED",
 
 	LOGOUT = "LOGOUT",
-	SET_USER = "USER"
+	SET_USER = "USER",
+	GET_USER_INFO = "GET_USER_INFO"
 }
 
 const authSlice = createSlice({
@@ -31,6 +32,9 @@ const authSlice = createSlice({
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		[EAuthAction.LOGIN](state, action: PayloadAction<{ email: string, password: string }>) {
 			state.status = ERequestStatus.PENDING
+		},
+		[EAuthAction.GET_USER_INFO](state) {
+			state.status = ERequestStatus.PENDING;
 		},
 		[EAuthAction.LOGIN_SUCCESS](state, action: PayloadAction<number>) {
 			state.status = ERequestStatus.FULFILLED

@@ -1,11 +1,11 @@
 import { parseData } from '@/lib/parser';
 import usersSlice, { EUsersAction } from '@/slices/usersSlice';
-import { call, getContext, put, takeEvery } from 'typed-redux-saga';
+import { all, call, getContext, put, takeEvery } from 'typed-redux-saga';
 
 function* getUsers() {
-	const API = yield* getContext("API");
-	
+
 	try {
+		const API = yield* getContext("API");
 		const users = yield* call(API.getUsers);
 		if (!users || !Array.isArray(users)) {
 			throw new Error("Invalid users data");
@@ -23,7 +23,9 @@ function* getUsers() {
 }
 
 function* usersSaga() {
-	yield* takeEvery(usersSlice.actions[EUsersAction.GET_USERS].type, getUsers);
+	all([
+		yield* takeEvery(usersSlice.actions[EUsersAction.GET_USERS].type, getUsers)
+	]);
 }
 
 export default usersSaga;

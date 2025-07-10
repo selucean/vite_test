@@ -1,10 +1,10 @@
-import './index.css'
-import { createRoot } from 'react-dom/client'
-import { createBrowserRouter, Outlet, RouterProvider as Provider } from 'react-router'
-import StoreProvider from '@/components/providers/StoreProvider.tsx'
-import LoginForm from '@/pages/LoginForm.tsx'
-import Team from '@/pages/Team.tsx'
-import Header from '@/components/Header.tsx'
+import './index.css';
+import { createRoot } from 'react-dom/client';
+import { createBrowserRouter, Outlet, RouterProvider as Provider } from 'react-router';
+import StoreProvider from '@/components/providers/StoreProvider';
+import LoginPage from '@/pages/LoginPage';
+import TeamPage from '@/pages/TeamPage';
+import Header from '@/components/Header';
 
 const root = createRoot(document.getElementById("root")!);
 
@@ -12,7 +12,7 @@ const Layout = () => {
   return (
     <main className="grid min-h-screen grid-rows-[auto_1fr_auto]">
       <Header/>
-      <section className="flex-1 p-4 max-w-[1280px] mx-auto">
+      <section className="flex-1 p-4 max-w-[1280px] m-auto">
         <Outlet />
       </section>
       <footer className="border border-t-gray-200 p-2 text-center">
@@ -28,11 +28,11 @@ export const App = () => {
       children: [
         { 
           index: true, 
-          element: <LoginForm /> 
+          element: <LoginPage /> 
         },
         {
           path: "/team",
-          element: <Team />,
+          element: <TeamPage />,
         }
       ],
     },

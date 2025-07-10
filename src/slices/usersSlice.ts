@@ -1,4 +1,4 @@
-import { ERequestStatus, type TManager as TParsedUser, type TUser } from '@/lib/types';
+import { ERequestStatus, type TParsedUser, type TUser } from '@/lib/types';
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 export type TUsersState = {
